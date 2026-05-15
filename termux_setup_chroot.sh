@@ -145,7 +145,7 @@ DNS2=$(getprop net.dns2 2>/dev/null || echo "8.8.8.8")
 [ -z "$DNS1" ] && DNS1="1.1.1.1"
 [ -z "$DNS2" ] && DNS2="8.8.8.8"
 
-su -c "echo -e 'nameserver ${DNS1}\nnameserver ${DNS2}' > '${CHROOT_TARGET}/etc/resolv.conf'"
+su -c "rm -f '${CHROOT_TARGET}/etc/resolv.conf' && echo -e 'nameserver ${DNS1}\nnameserver ${DNS2}' > '${CHROOT_TARGET}/etc/resolv.conf'"
 log "resolv.conf configurato: $DNS1, $DNS2"
 
 # ─── PHASE 7: Installazione Mediaflow Proxy Light ───────────
@@ -191,9 +191,7 @@ fi
 touch "$LOG_FILE"
 exec >> "$LOG_FILE" 2>&1
 
-# Aggiunge GID 3003 per permessi socket rete su Android
-newgrp inet_android 2>/dev/null || true
-sg inet_android -c "echo '[OK] GID 3003 inet_android attivo'" 2>/dev/null || true
+# I permessi di rete GID 3003 vengono iniettati direttamente da 'su -G 3003' nel launcher Termux
 
 echo "=================================================="
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] MediaFlow Proxy Light Avvio"
@@ -206,7 +204,7 @@ sleep 1
 export APP__AUTH__API_PASSWORD="${APP__AUTH__API_PASSWORD:-mediaflow_secret}"
 
 echo "Avvio MediaFlow Proxy Light..."
-if ! sg inet_android -c "CONFIG_PATH=/etc/mediaflow.toml /usr/local/bin/mediaflow-proxy-light"; then
+if ! CONFIG_PATH=/etc/mediaflow.toml /usr/local/bin/mediaflow-proxy-light; then
     echo "[CRITICAL] MediaFlow Proxy ha crashato!"
     exit 1
 fi
@@ -243,7 +241,7 @@ echo ""
 
 DNS1=\$(getprop net.dns1 2>/dev/null || echo "1.1.1.1")
 DNS2=\$(getprop net.dns2 2>/dev/null || echo "8.8.8.8")
-su -c "echo -e 'nameserver \${DNS1}\nnameserver \${DNS2}' > '\${ROOTFS}/etc/resolv.conf'" 2>/dev/null || true
+su -c "rm -f '\${ROOTFS}/etc/resolv.conf' && echo -e 'nameserver \${DNS1}\nnameserver \${DNS2}' > '\${ROOTFS}/etc/resolv.conf'" 2>/dev/null || true
 
 su -c "
     mountpoint -q '\${ROOTFS}/proc'    || mount -t proc proc '\${ROOTFS}/proc'
@@ -257,7 +255,7 @@ su -c "
 " 2>/dev/null
 
 screen -L -Logfile "\$TERMUX_LOG" -dmS mediaflow \
-    su -c "chroot '\${ROOTFS}' /root/mediaflow_chroot_start.sh"
+    su -G 3003 -c "chroot '\${ROOTFS}' /root/mediaflow_chroot_start.sh"
 
 sleep 2
 echo "MediaFlow avviato in background."
