@@ -239,8 +239,10 @@ echo "   Log:       mediaflow-logs"
 echo "   Stop:      mediaflow-stop"
 echo ""
 
-DNS1=\$(getprop net.dns1 2>/dev/null || echo "1.1.1.1")
-DNS2=\$(getprop net.dns2 2>/dev/null || echo "8.8.8.8")
+DNS1=\$(getprop net.dns1 2>/dev/null)
+[ -z "\$DNS1" ] && DNS1="1.1.1.1"
+DNS2=\$(getprop net.dns2 2>/dev/null)
+[ -z "\$DNS2" ] && DNS2="8.8.8.8"
 su -c "rm -f '\${ROOTFS}/etc/resolv.conf' && echo -e 'nameserver \${DNS1}\nnameserver \${DNS2}' > '\${ROOTFS}/etc/resolv.conf'" 2>/dev/null || true
 
 su -c "
