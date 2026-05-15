@@ -165,8 +165,8 @@ su -c "chroot '$CHROOT_TARGET' /bin/bash -c '
         echo \"Scaricamento configurazione base in /etc/mediaflow.toml...\"
         wget -q https://raw.githubusercontent.com/mhdzumair/MediaFlow-Proxy-Light/main/config-example.toml -O /etc/mediaflow.toml
         # Imposta host a 0.0.0.0 e port a 8888 come default
-        sed -i \"s/host = .*/host = \\\"0.0.0.0\\\"/\" /etc/mediaflow.toml
-        sed -i \"s/port = .*/port = 8888/\" /etc/mediaflow.toml
+        sed -i \"s/^host = .*/host = \\\"0.0.0.0\\\"/\" /etc/mediaflow.toml
+        sed -i \"s/^port = .*/port = 8888/\" /etc/mediaflow.toml
     fi
 '"
 log "MediaFlow Proxy Light installato in /usr/local/bin/mediaflow-proxy-light."
