@@ -167,6 +167,8 @@ su -c "chroot '$CHROOT_TARGET' /bin/bash -c '
         # Imposta host a 0.0.0.0 e port a 8888 come default
         sed -i \"s/^host = .*/host = \\\"0.0.0.0\\\"/\" /etc/mediaflow.toml
         sed -i \"s/^port = .*/port = 8888/\" /etc/mediaflow.toml
+        # Disabilita verifica SSL globale per supportare i server di streaming di Vavoo
+        sed -i 's|\"https://api.service.com\".*|\"https://*\" = { proxy = false, verify_ssl = false }|g' /etc/mediaflow.toml
     fi
 '"
 log "MediaFlow Proxy Light installato in /usr/local/bin/mediaflow-proxy-light."
