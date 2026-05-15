@@ -334,7 +334,7 @@ su -c "
     mountpoint -q '\${ROOTFS}/proc' || mount -t proc proc '\${ROOTFS}/proc'
     mountpoint -q '\${ROOTFS}/sys'  || mount -t sysfs sysfs '\${ROOTFS}/sys'
     mountpoint -q '\${ROOTFS}/dev'  || mount --bind /dev '\${ROOTFS}/dev'
-    chroot '\${ROOTFS}' /bin/bash -l
+    chroot '\${ROOTFS}' /bin/bash -c 'export PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"; exec /bin/bash'
 "
 SHELL_EOF
 chmod +x "$PREFIX/bin/mediaflow-shell"
