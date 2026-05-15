@@ -155,7 +155,7 @@ su -c "chroot '$CHROOT_TARGET' /bin/bash -c '
     export PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"
     export DEBIAN_FRONTEND=noninteractive
     
-    apt-get update -yqq && apt-get install -yqq wget curl ca-certificates
+    apt-get update -yqq && apt-get install -yqq wget curl ca-certificates login
     
     echo \"Download mediaflow-proxy-light-linux-aarch64...\"
     wget -q --show-progress https://github.com/mhdzumair/MediaFlow-Proxy-Light/releases/latest/download/mediaflow-proxy-light-linux-aarch64 -O /usr/local/bin/mediaflow-proxy-light
