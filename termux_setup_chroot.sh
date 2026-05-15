@@ -206,7 +206,7 @@ sleep 1
 export APP__AUTH__API_PASSWORD="${APP__AUTH__API_PASSWORD:-mediaflow_secret}"
 
 echo "Avvio MediaFlow Proxy Light..."
-if ! CONFIG_PATH=/etc/mediaflow.toml /usr/local/bin/mediaflow-proxy-light; then
+if ! sg inet_android -c "CONFIG_PATH=/etc/mediaflow.toml /usr/local/bin/mediaflow-proxy-light"; then
     echo "[CRITICAL] MediaFlow Proxy ha crashato!"
     exit 1
 fi
