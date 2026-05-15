@@ -151,7 +151,7 @@ log "resolv.conf configurato: $DNS1, $DNS2"
 # ─── PHASE 7: Installazione Mediaflow Proxy Light ───────────
 step "Phase 7/9: Installazione MediaFlow Proxy Light"
 
-su -c "chroot '$CHROOT_TARGET' /bin/bash -c '
+su -G 3003 -c "chroot '$CHROOT_TARGET' /bin/bash -c '
     export PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"
     export DEBIAN_FRONTEND=noninteractive
     
@@ -164,13 +164,13 @@ su -c "chroot '$CHROOT_TARGET' /bin/bash -c '
     if [ ! -f /etc/mediaflow.toml ]; then
         echo \"Scaricamento configurazione base in /etc/mediaflow.toml...\"
         wget -q https://raw.githubusercontent.com/mhdzumair/MediaFlow-Proxy-Light/main/config-example.toml -O /etc/mediaflow.toml
-        # Imposta host a 0.0.0.0 e port a 8888 come default
-        sed -i \"s/^host = .*/host = \\\"0.0.0.0\\\"/\" /etc/mediaflow.toml
-        sed -i \"s/^port = .*/port = 8888/\" /etc/mediaflow.toml
-        # Disabilita verifica SSL globale per supportare i server di streaming di Vavoo
-        sed -i 's|\"https://api.service.com\".*|\"https://*\" = { proxy = false, verify_ssl = false }|g' /etc/mediaflow.toml
     fi
 '"
+
+# Imposta configurazione usando sed da fuori il chroot per evitare conflitti di apici
+su -c "sed -i 's/^host = .*/host = \"0.0.0.0\"/' '${CHROOT_TARGET}/etc/mediaflow.toml'"
+su -c "sed -i 's/^port = .*/port = 8888/' '${CHROOT_TARGET}/etc/mediaflow.toml'"
+su -c "sed -i 's|\"https://api.service.com\".*|\"https://*\" = { proxy = false, verify_ssl = false }|g' '${CHROOT_TARGET}/etc/mediaflow.toml'"
 log "MediaFlow Proxy Light installato in /usr/local/bin/mediaflow-proxy-light."
 
 # ─── PHASE 8: Script di avvio interno al CHRoot ─────────────
@@ -315,7 +315,7 @@ ROOTFS="${CHROOT_ROOTFS_PATH}"
 echo "Aggiornamento MediaFlow Proxy Light..."
 mediaflow-stop 2>/dev/null || true
 
-su -c "chroot '\${ROOTFS}' /bin/bash -c '
+su -G 3003 -c "chroot '\${ROOTFS}' /bin/bash -c '
     echo \"Download nuova versione...\"
     wget -q --show-progress https://github.com/mhdzumair/MediaFlow-Proxy-Light/releases/latest/download/mediaflow-proxy-light-linux-aarch64 -O /usr/local/bin/mediaflow-proxy-light
     chmod +x /usr/local/bin/mediaflow-proxy-light
