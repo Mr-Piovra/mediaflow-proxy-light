@@ -127,6 +127,7 @@ log "CHRoot funzionante."
 step "Phase 5/9: Configurazione Android Network (GID 3003)"
 
 su -c "chroot '$CHROOT_TARGET' /bin/bash -c '
+    export PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"
     if ! grep -q \"^inet_android:\" /etc/group 2>/dev/null; then
         echo \"inet_android:x:3003:root\" >> /etc/group
     fi
